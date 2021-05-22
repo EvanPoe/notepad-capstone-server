@@ -1,0 +1,44 @@
+{
+  "name": "notepad-capstone-client",
+  "version": "0.1.0",
+  "description": "Busy schedule? Do you find it difficult to keep track of everything? NotePad is a place to store all your notes-anything you need to save, available anytime you need it!",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha --require test/setup.js --watch",
+    "dev": "nodemon src/server.js",
+    "migrate": "postgrator --config postgrator-config.js",
+    "start": "nodemon src/server.js",
+    "predeploy": "npm audit",
+    "deploy": "git push heroku master"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "eslint": "^6.6.0",
+    "express": "^4.17.1",
+    "helmet": "^3.22.0",
+    "isomorphic-fetch": "^3.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.20.3",
+    "morgan": "^1.9.1",
+    "path": "^0.12.7",
+    "pg": "^7.18.2",
+    "postgrator": "^3.10.2",
+    "winston": "^3.2.1",
+    "xss": "^1.0.6"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.4.0",
+    "nodemon": "^2.0.4",
+    "postgrator-cli": "^3.1.0",
+    "supertest": "^3.3.0"
+  },
+  "engines": {
+    "node": "12.x"
+  }
+}
