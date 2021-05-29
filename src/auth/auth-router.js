@@ -10,7 +10,7 @@ const jsonBodyParser = express.json()
 authRouter
 //??? when posting to /login... parse body to JSON... do so with the request, response, and next function 
   .post('/login', jsonBodyParser, (req, res, next) => {
-    //email and password are now = req.body's two items and loginUser takes those 
+    //email and password are now = req.body's two notes and loginUser takes those 
     //values and sets them to email/password
     const {
       email,

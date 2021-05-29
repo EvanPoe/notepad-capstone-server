@@ -7,7 +7,7 @@ const { NODE_ENV } = require('./config')
 const errorHandler = require('./middleware/error-handler')
 const usersRouter = require('./users/users-router')
 const authRouter = require('./auth/auth-router')
-const itemsRouter = require('./items/items-router')
+const notesRouter = require('./notes/notes-router')
 
 //pushing code to overwrite what's in heroku
 const app = express()
@@ -29,8 +29,8 @@ app.use(express.static('public'))
 app.use('/api/users', usersRouter)
 //load in the authentication router, for login
 app.use('/api/auth', authRouter)
-//load in the items router
-app.use('/api/items', itemsRouter)
+//load in the notes router
+app.use('/api/notes', notesRouter)
 app.use(errorHandler)
 
 module.exports = app

@@ -1,46 +1,40 @@
-const ItemService = {
+const NoteService = {
   //relevant
-  getItems(db) {
+  getNotes(db) {
       return db
           .select('*')
-          .from('items')
+          .from('notes')
   },
-  getItemById(db, item_id) {
+  getNoteById(db, note_id) {
       return db
           .select('*')
-          .from('items')
-          .where('items.id', item_id)
+          .from('notes')
+          .where('notes.id', note_id)
           .first()
   },
-  getPublicItems(db) {
+  getNoteByUserId(db, user_id) {
       return db
           .select('*')
-          .from('items')
-          .where('items.is_public', 1)
-  },
-  getItemByUserId(db, user_id) {
-      return db
-          .select('*')
-          .from('items')
-          .where('items.user_id', user_id)
-          .orderBy('items.id', 'desc')
+          .from('notes')
+          .where('notes.user_id', user_id)
+          .orderBy('notes.id', 'desc')
   },
   //relevant
-  insertItem(db, newItem) {
+  insertNote(db, newNote) {
       return db
-          .insert(newItem)
-          .into('items')
+          .insert(newNote)
+          .into('notes')
           .returning('*')
           .then(rows => {
               return rows[0]
           })
   },
   //relevant
-  updateItem(db, item_id, newItem) {
-      return db('items')
-          .update(newItem, returning = true)
+  updateNote(db, note_id, newNote) {
+      return db('notes')
+          .update(newNote, returning = true)
           .where({
-              id: item_id
+              id: note_id
           })
           .returning('*')
           .then(rows => {
@@ -48,13 +42,13 @@ const ItemService = {
           })
   },
   //relevant
-  deleteItem(db, item_id) {
-      return db('items')
+  deleteNote(db, note_id) {
+      return db('notes')
           .delete()
           .where({
-              'id': item_id
+              'id': note_id
           })
   }
 }
 
-module.exports = ItemService
+module.exports = NoteService

@@ -38,9 +38,9 @@ describe('Todo API:', function () {
         .expect(res => {
           expect(res.body).to.be.a('array');
           expect(res.body).to.have.length(todos.length);
-          res.body.forEach((item) => {
-            expect(item).to.be.a('object');
-            expect(item).to.include.keys('id', 'title', 'completed');
+          res.body.forEach((note) => {
+            expect(note).to.be.a('object');
+            expect(note).to.include.keys('id', 'title', 'completed');
           });
         });
     });
@@ -85,30 +85,30 @@ describe('Todo API:', function () {
   describe('POST /v1/todos', function () {
 
     it('should create and return a new todo when provided valid data', function () {
-      const newItem = {
+      const newNote = {
         'title': 'Do Dishes'
       };
 
       return supertest(app)
         .post('/v1/todos')
-        .send(newItem)
+        .send(newNote)
         .expect(201)
         .expect(res => {
           expect(res.body).to.be.a('object');
           expect(res.body).to.include.keys('id', 'title', 'completed');
-          expect(res.body.title).to.equal(newItem.title);
+          expect(res.body.title).to.equal(newNote.title);
           expect(res.body.completed).to.be.false;
           expect(res.headers.location).to.equal(`/v1/todos/${res.body.id}`)
         });
     });
 
     it('should respond with 400 status when given bad data', function () {
-      const badItem = {
-        foobar: 'broken item'
+      const badNote = {
+        foobar: 'broken note'
       };
       return supertest(app)
         .post('/v1/todos')
-        .send(badItem)
+        .send(badNote)
         .expect(400);
     });
 
@@ -121,8 +121,8 @@ describe('Todo API:', function () {
       return db('todo').insert(todos);
     })
 
-    it('should update item when given valid data and an id', function () {
-      const item = {
+    it('should update note when given valid data and an id', function () {
+      const note = {
         'title': 'Buy New Dishes'
       };
       
@@ -133,20 +133,20 @@ describe('Todo API:', function () {
           doc = _doc
           return supertest(app)
             .patch(`/v1/todos/${doc.id}`)
-            .send(item)
+            .send(note)
             .expect(200);
         })
         .then(res => {
           expect(res.body).to.be.a('object');
           expect(res.body).to.include.keys('id', 'title', 'completed');
-          expect(res.body.title).to.equal(item.title);
+          expect(res.body.title).to.equal(note.title);
           expect(res.body.completed).to.be.false;
         });
     });
 
     it('should respond with 400 status when given bad data', function () {
-      const badItem = {
-        foobar: 'broken item'
+      const badNote = {
+        foobar: 'broken note'
       };
       
       return db('todo')
@@ -154,18 +154,18 @@ describe('Todo API:', function () {
         .then(doc => {
           return supertest(app)
             .patch(`/v1/todos/${doc.id}`)
-            .send(badItem)
+            .send(badNote)
             .expect(400);
         })
     });
 
     it('should respond with a 404 for an invalid id', () => {
-      const item = {
+      const note = {
         'title': 'Buy New Dishes'
       };
       return supertest(app)
         .patch('/v1/todos/aaaaaaaaaaaaaaaaaaaaaaaa')
-        .send(item)
+        .send(note)
         .expect(404);
     });
 
@@ -177,7 +177,7 @@ describe('Todo API:', function () {
       return db('todo').insert(todos);
     })
 
-    it('should delete an item by id', () => {
+    it('should delete an note by id', () => {
       return db('todo')
         .first()
         .then(doc => {
