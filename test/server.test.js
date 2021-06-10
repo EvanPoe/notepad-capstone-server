@@ -1,199 +1,194 @@
-const knex = require('knex')
-const app = require('../src/app');
+const knex = require("knex");
+const app = require("../src/app");
 
-describe('Todo API:', function () {
+describe("Note API:", function () {
   let db;
-  let todos = [
-    { "title": "Buy Milk",   "completed": false },
-    { "title": "Do Laundry",  "completed": true },
-    { "title": "Vacuum", "completed": false },
-    { "title": "Wash Windows",    "completed": true },
-    { "title": "Make Bed", "completed": false }
-  ]
+  let notes = [
+    {
+      user_id: 1,
+      title: "second note",
+      content: "2nd note",
+    },
+    {
+      user_id: 1,
+      title: "third note",
+      content: "3rd note's notes",
+    },
+    {
+      user_id: 1,
+      title: "tonight's schedule",
+      content: "Eat dinner. Then go to sleep.",
+    },
+    {
+      user_id: 1,
+      title: "grocery list",
+      content: "Get milk, eggs, meat, and veggies.",
+    },
+    {
+      user_id: 1,
+      title: "errands",
+      content: "Drop off mail. Get oil changed.",
+    },
+  ];
 
-  before('make knex instance', () => {  
+  before("make knex instance", () => {
     db = knex({
-      client: 'pg',
+      client: "pg",
       connection: process.env.TEST_DATABASE_URL,
-    })
-    app.set('db', db)
+    });
+    app.set("db", db);
   });
-  
-  before('cleanup', () => db.raw('TRUNCATE TABLE todo RESTART IDENTITY;'));
 
-  afterEach('cleanup', () => db.raw('TRUNCATE TABLE todo RESTART IDENTITY;')); 
+  before("cleanup", () => db.raw("TRUNCATE TABLE notes RESTART IDENTITY;"));
 
-  after('disconnect from the database', () => db.destroy()); 
+  afterEach("cleanup", () => db.raw("TRUNCATE TABLE notes RESTART IDENTITY;"));
 
-  describe('GET /v1/todos', () => {
+  after("disconnect from the database", () => db.destroy());
 
-    beforeEach('insert some todos', () => {
-      return db('todo').insert(todos);
-    })
+  describe("GET /api/notes", () => {
+    beforeEach("insert some notes", () => {
+      return db("notes").insert(notes);
+    });
 
-    it('should respond to GET `/v1/todos` with an array of todos and status 200', function () {
+    it("should respond to GET `/api/notes` with an array of notes and status 200", function () {
       return supertest(app)
-        .get('/v1/todos')
+        .get("/api/notes")
         .expect(200)
-        .expect(res => {
-          expect(res.body).to.be.a('array');
-          expect(res.body).to.have.length(todos.length);
+        .expect((res) => {
+          expect(res.body).to.be.a("array");
+          expect(res.body).to.have.length(notes.length);
           res.body.forEach((note) => {
-            expect(note).to.be.a('object');
-            expect(note).to.include.keys('id', 'title', 'completed');
+            expect(note).to.be.a("object");
           });
         });
     });
-
   });
 
-  
-  describe('GET /v1/todos/:id', () => {
+  describe("GET /api/notes/:id", () => {
+    beforeEach("insert some notes", () => {
+      return db("notes").insert(notes);
+    });
 
-    beforeEach('insert some todos', () => {
-      return db('todo').insert(todos);
-    })
-
-    it('should return correct todo when given an id', () => {
+    it("should return correct note when given an id", () => {
       let doc;
-      return db('todo')
+      return db("notes")
         .first()
-        .then(_doc => {
-          doc = _doc
-          return supertest(app)
-            .get(`/v1/todos/${doc.id}`)
-            .expect(200);
+        .then((_doc) => {
+          doc = _doc;
+          return supertest(app).get(`/api/notes/${doc.id}`).expect(200);
         })
-        .then(res => {
-          expect(res.body).to.be.an('object');
-          expect(res.body).to.include.keys('id', 'title', 'completed');
+        .then((res) => {
+          expect(res.body).to.be.an("object");
           expect(res.body.id).to.equal(doc.id);
           expect(res.body.title).to.equal(doc.title);
           expect(res.body.completed).to.equal(doc.completed);
         });
     });
 
-    it('should respond with a 404 when given an invalid id', () => {
-      return supertest(app)
-        .get('/v1/todos/aaaaaaaaaaaa')
-        .expect(404);
+    it("should respond with a 404 when given an invalid id", () => {
+      return supertest(app).get("/api/notes/aaaaaaaaaaaa").expect(404);
     });
-    
   });
 
-  
-  describe('POST /v1/todos', function () {
-
-    it('should create and return a new todo when provided valid data', function () {
+  describe("POST /api/notes", function () {
+    it("should create and return a new note when provided valid data", function () {
       const newNote = {
-        'title': 'Do Dishes'
+        user_id: 1,
+        title: "totally unique note",
+        content: "some completely unique notes!",
       };
 
       return supertest(app)
-        .post('/v1/todos')
+        .post("/api/notes")
         .send(newNote)
         .expect(201)
-        .expect(res => {
-          expect(res.body).to.be.a('object');
-          expect(res.body).to.include.keys('id', 'title', 'completed');
+        .expect((res) => {
+          expect(res.body).to.be.a("object");
           expect(res.body.title).to.equal(newNote.title);
-          expect(res.body.completed).to.be.false;
-          expect(res.headers.location).to.equal(`/v1/todos/${res.body.id}`)
         });
     });
 
-    it('should respond with 400 status when given bad data', function () {
+    it("should respond with 400 status when given bad data", function () {
       const badNote = {
-        foobar: 'broken note'
+        foobar: "broken note",
       };
-      return supertest(app)
-        .post('/v1/todos')
-        .send(badNote)
-        .expect(400);
+      return supertest(app).post("/api/notes").send(badNote).expect(400);
     });
-
   });
 
-  
-  describe('PATCH /v1/todos/:id', () => {
+  describe("PATCH /api/notes/:id", () => {
+    beforeEach("insert some notes", () => {
+      return db("notes").insert(notes);
+    });
 
-    beforeEach('insert some todos', () => {
-      return db('todo').insert(todos);
-    })
-
-    it('should update note when given valid data and an id', function () {
+    it("should update note when given valid data and an id", function () {
       const note = {
-        'title': 'Buy New Dishes'
+        user_id: 1,
+        title: "edited note",
+        content: "an updated note",
       };
-      
+
       let doc;
-      return db('todo')
+      return db("notes")
         .first()
-        .then(_doc => {
-          doc = _doc
+        .then((_doc) => {
+          doc = _doc;
           return supertest(app)
-            .patch(`/v1/todos/${doc.id}`)
+            .patch(`/api/notes/${doc.id}`)
             .send(note)
             .expect(200);
         })
-        .then(res => {
-          expect(res.body).to.be.a('object');
-          expect(res.body).to.include.keys('id', 'title', 'completed');
+        .then((res) => {
+          expect(res.body).to.be.a("object");
           expect(res.body.title).to.equal(note.title);
-          expect(res.body.completed).to.be.false;
         });
     });
 
-    it('should respond with 400 status when given bad data', function () {
+    it("should respond with 400 status when given bad data", function () {
       const badNote = {
-        foobar: 'broken note'
+        foobar: "broken note",
       };
-      
-      return db('todo')
+
+      return db("notes")
         .first()
-        .then(doc => {
+        .then((doc) => {
           return supertest(app)
-            .patch(`/v1/todos/${doc.id}`)
+            .patch(`/api/notes/${doc.id}`)
             .send(badNote)
             .expect(400);
-        })
+        });
     });
 
-    it('should respond with a 404 for an invalid id', () => {
+    it("should respond with a 404 for an invalid id", () => {
       const note = {
-        'title': 'Buy New Dishes'
+        user_id: 1,
+        title: "last note",
+        content: "last note",
       };
       return supertest(app)
-        .patch('/v1/todos/aaaaaaaaaaaaaaaaaaaaaaaa')
+        .patch("/api/notes/aaaaaaaaaaaaaaaaaaaaaaaa")
         .send(note)
         .expect(404);
     });
-
   });
 
-  describe('DELETE /v1/todos/:id', () => {
-
-    beforeEach('insert some todos', () => {
-      return db('todo').insert(todos);
-    })
-
-    it('should delete an note by id', () => {
-      return db('todo')
-        .first()
-        .then(doc => {
-          return supertest(app)
-            .delete(`/v1/todos/${doc.id}`)
-            .expect(204);
-        })
+  describe("DELETE /api/notes/:id", () => {
+    beforeEach("insert some notes", () => {
+      return db("notes").insert(notes);
     });
 
-    it('should respond with a 404 for an invalid id', function () {
-      
+    it("should delete an note by id", () => {
+      return db("notes")
+        .first()
+        .then((doc) => {
+          return supertest(app).delete(`/api/notes/${doc.id}`).expect(204);
+        });
+    });
+
+    it("should respond with a 404 for an invalid id", function () {
       return supertest(app)
-        .delete('/v1/todos/aaaaaaaaaaaaaaaaaaaaaaaa')
+        .delete("/api/notes/aaaaaaaaaaaaaaaaaaaaaaaa")
         .expect(404);
     });
-
   });
-
 });
