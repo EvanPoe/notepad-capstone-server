@@ -19,7 +19,14 @@ const morganOption = (NODE_ENV === 'production')
 app.use(morgan(morganOption, {
   skip: () => NODE_ENV === 'test',
 }))
-app.use(cors())
+
+const corsOptions ={
+  origin:'*', 
+  credentials:true,            //access-control-allow-credentials:true
+  optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions))
 app.use(helmet())
 
 app.use(express.static('public'))
