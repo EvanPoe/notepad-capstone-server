@@ -9,7 +9,8 @@ pg.defaults.ssl = process.env.NODE_ENV === "production";
 //and the url for the databse
 const db = knex({ 
   client: 'pg',
-  connection: DATABASE_URL
+  connection: DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 })
 
 app.set('db', db)
